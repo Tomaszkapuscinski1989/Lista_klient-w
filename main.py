@@ -72,7 +72,7 @@ class Main(ttb.Window):
         with open_base(self.nazwa_bazy) as c:
             c.execute(
                 """CREATE TABLE company (
-                    company_id INTIGER PRIMARY KEY,
+
                     company_name TEXT DEFAULT "NaN",
                     company_address TEXT DEFAULT "NaN",
                     website_address TEXT DEFAULT "NaN",
@@ -155,7 +155,7 @@ class Main(ttb.Window):
             self.my_tree.delete(item)
 
         with open_base(self.nazwa_bazy) as c:
-            c.execute("SELECT * FROM company")
+            c.execute("SELECT oid, * FROM company")
             w1 = c.fetchall()
         # Create Sample Data
         contacts = []
@@ -173,12 +173,6 @@ class Main(ttb.Window):
         # Grab record values
         self.values = self.my_tree.item(selected, "values")
 
-    def idNumber(self):
-        with open_base(self.nazwa_bazy) as c:
-            c.execute("SELECT * FROM company")
-            w1 = c.fetchall()
-
-        self.entryLabel.insert(0, len(w1) + 1)
 
     def w2(self, mode, tablica=[]):
 
@@ -188,12 +182,6 @@ class Main(ttb.Window):
             self.window2, text="Nowy klient", font=font_d, bootstyle="danger"
         )
         label2.grid(row=0, column=0, columnspan=2)
-
-        label3 = ttb.Label(self.window2, text="Id:", font=font_d, bootstyle="danger")
-        label3.grid(row=2, column=0)
-
-        self.entryLabel = ttb.Entry(self.window2, font=font_m, bootstyle="danger")
-        self.entryLabel.grid(row=2, column=1)
 
         label4 = ttb.Label(
             self.window2, text="Nazwa firmy:", font=font_d, bootstyle="danger"
@@ -272,7 +260,6 @@ class Main(ttb.Window):
             button9.bind("<Button-1>", self.dodaj2)
             button9.bind("<Return>", self.dodaj2)
 
-            self.idNumber()
 
         if mode == 1 or mode == 3:
             self.entryLabel.insert(0, tablica[0])
@@ -300,9 +287,9 @@ class Main(ttb.Window):
 
         with open_base(self.nazwa_bazy) as c:
             c.execute(
-                "INSERT INTO company (company_id, company_name, company_address, website_address, email_address, phone_number, nip, regon, krs, info) VALUES (:company_id, :company_name, :company_address, :website_address, :email_address, :phone_number, :nip, :regon, :krs, :info)",
+                "INSERT INTO company (company_name, company_address, website_address, email_address, phone_number, nip, regon, krs, info) VALUES ( :company_name, :company_address, :website_address, :email_address, :phone_number, :nip, :regon, :krs, :info)",
                 {
-                    "company_id": self.entryLabel.get(),
+
                     "company_name": self.entry1.get(),
                     "company_address": self.entry2.get(),
                     "website_address": self.entry3.get(),
@@ -323,10 +310,9 @@ class Main(ttb.Window):
         try:
             with open_base(self.nazwa_bazy) as c:
                 c.execute(
-                    "SELECT oid, * FROM company where company_id=:oid", {"oid": self.values[0]}
+                    "SELECT oid, * FROM company where oid=:rr", {"rr": self.values[0]}
                 )
                 r = c.fetchone()
-                print(r)
 
             self.w2(3, r)
 
@@ -342,9 +328,9 @@ class Main(ttb.Window):
     def edytuj2(self, e):
         with open_base(self.nazwa_bazy) as c:
             c.execute(
-                "UPDATE company SET company_name=:company_name, company_address=:company_address, website_address=:website_address, email_address=:email_address, phone_number=:phone_number, nip=:nip, regon=:regon, krs=:krs, info=:info  WHERE company_id=:oid",
+                "UPDATE company SET company_name=:company_name, company_address=:company_address, website_address=:website_address, email_address=:email_address, phone_number=:phone_number, nip=:nip, regon=:regon, krs=:krs, info=:info  WHERE oid=:rr",
                 {
-                    "oid": self.values[0],
+                    "rr": self.values[0],
                     "company_name": self.entry1.get(),
                     "company_address": self.entry2.get(),
                     "website_address": self.entry3.get(),
@@ -364,7 +350,7 @@ class Main(ttb.Window):
         try:
             with open_base(self.nazwa_bazy) as c:
                 c.execute(
-                    "SELECT * FROM company where company_id=:oid", {"oid": self.values[0]}
+                    "SELECT oid, * FROM company where oid=:rr", {"rr": self.values[0]}
                 )
                 r = c.fetchone()
 
@@ -384,7 +370,7 @@ class Main(ttb.Window):
         try:
             with open_base(self.nazwa_bazy) as c:
                 c.execute(
-                    "DELETE FROM company where company_id=:oid", {"oid": self.values[0]}
+                    "DELETE FROM company where oid=:rr", {"rr": self.values[0]}
                 )
 
             self.TreeView()
